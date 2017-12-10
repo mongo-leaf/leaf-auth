@@ -6,9 +6,8 @@ const Strings = require('hyvalidator').Strings;
 // Crypting Library
 const bcrypt = require('bcryptjs');
 // Secret from config file
-const secrets = {
-    "jwt": "im just standard"
-}
+const secrets = require("./security.module.js").secrets;
+
 const moment = require('moment');
 //User Collection
 const User = require('../models/user.model.js').User;
