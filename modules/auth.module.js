@@ -61,22 +61,22 @@ async function register(user) {
 }
 
 async function getUserFromToken(token) {
-    try {
-        let decoded = jwt.decode(token);
+    let decoded = jwt.decode(token);
+    if (decoded && decoded !== null) {
         let data = await User.find({ email: decoded.email })
         if (data[0]) {
             return data[0];
         } else {
             return {};
         }
-    } catch (e) {
-        throw e
+    } else {
+        throw "Invalid Token";
     }
 }
 
 function generateToken(user, expiresIn) {
     let payload = generatePayload(user, new Date())
-    let token = jwt.sign(payload, secrets.jwt, { expiresIn: expiresIn || _expiresIn});
+    let token = jwt.sign(payload, secrets.jwt, { expiresIn: expiresIn || _expiresIn });
 
     return token;
 }
@@ -94,10 +94,13 @@ function refreshToken(token) {
     try {
         let decoded = jwt.decode(token);
         if (moment(decoded.createdAt).add(1, "day") > moment()) {
-            return generateToken(decoded,3600);
+            return generateToken(decoded, 3600);
+        } else {
+            return "Token expired";
         }
     } catch (e) {
-        throw e;
+        return "Invalid token";
     }
 }
+
 
