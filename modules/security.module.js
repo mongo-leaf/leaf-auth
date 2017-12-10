@@ -5,7 +5,7 @@ const secrets = {
 }
 
 module.exports.verifyToken = async (token) => {
-    jwt.verify(token, secrets, (err, decoded) => {
+    jwt.verify(token, secrets.jwt, (err, decoded) => {
         if (err) {
             throw err;
         }
