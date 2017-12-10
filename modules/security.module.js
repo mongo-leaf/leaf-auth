@@ -4,14 +4,17 @@ const secrets = {
     "jwt": "im just standard"
 }
 
-module.exports.verifyToken = async (token) => {
-    jwt.verify(token, secrets.jwt, (err, decoded) => {
-        if (err) {
-            throw err;
-        }
-        return decoded;
-    });
+module.exports.verifyToken = (token) => {
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, secrets.jwt, (err, decoded) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(decoded);
+        });
+    })
 }
+
 
 module.exports.setSecret = (secret) => {
     secrets.jwt = secret;
