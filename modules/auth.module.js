@@ -18,6 +18,8 @@ module.exports.login = login;
 module.exports.register = register;
 module.exports.getUserFromToken = getUserFromToken;
 module.exports.refreshToken = refreshToken;
+module.exports.updateUser = updateUser;
+module.exports.updatePassword = updatePassword;
 
 
 
@@ -48,8 +50,7 @@ async function register(user) {
         if (data && data.length && data.length > 0) {
             throw ("This Email Is Already Taken");
         } else {
-            let salt = bcrypt.genSaltSync(10);
-            let hash = bcrypt.hashSync(user.password, salt);
+            let hash = generatePassword(user.password);
             user.password = hash;
             let fuser = await User.insertOne(user);
             return fuser;
@@ -57,6 +58,20 @@ async function register(user) {
     }
 }
 
+async function updateUser(mongoId, user) {
+    let fuser = await User.findById(mongoId);
+    user.password = fuser.password;
+    await User.updateById(mongoId, user);
+    return user;
+
+}
+async function updatePassword(mongoId, newPassword) {
+    let user = await User.findById(mongoId);
+    user.password = generatePassword(newPassword);
+    await User.updateById(mongoId, user);
+    return user;
+
+}
 async function getUserFromToken(token) {
     let decoded = jwt.decode(token);
     if (decoded && decoded !== null) {
@@ -82,4 +97,10 @@ function refreshToken(token) {
     } catch (e) {
         return "Invalid token";
     }
+}
+
+function generatePassword(password) {
+    let salt = bcrypt.genSaltSync(10);
+    let hash = bcrypt.hashSync(password, salt);
+    return hash;
 }
