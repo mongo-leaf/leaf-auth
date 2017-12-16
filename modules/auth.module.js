@@ -61,6 +61,7 @@ async function register(user) {
 async function updateUser(mongoId, user) {
     let fuser = await User.findById(mongoId);
     user.password = fuser.password;
+    delete user._id;
     await User.updateById(mongoId, user);
     return user;
 
@@ -68,6 +69,7 @@ async function updateUser(mongoId, user) {
 async function updatePassword(mongoId, newPassword) {
     let user = await User.findById(mongoId);
     user.password = generatePassword(newPassword);
+    delete user._id;
     await User.updateById(mongoId, user);
     return user;
 
