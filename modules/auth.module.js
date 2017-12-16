@@ -7,6 +7,8 @@ const Strings = require('hyvalidator').Strings;
 const bcrypt = require('bcryptjs');
 // Secret from config file
 const secrets = require("./security.module.js").secrets;
+// Generate token from Security
+const generateToken = require("./security.module.js").generateToken;
 
 const moment = require('moment');
 //User Collection
@@ -17,9 +19,6 @@ module.exports.register = register;
 module.exports.getUserFromToken = getUserFromToken;
 module.exports.refreshToken = refreshToken;
 
-
-//defaults
-const _expiresIn = 3600;
 
 
 async function login(email, password) {
@@ -52,7 +51,6 @@ async function register(user) {
             let salt = bcrypt.genSaltSync(10);
             let hash = bcrypt.hashSync(user.password, salt);
             user.password = hash;
-            user.salt = salt;
             let fuser = await User.insertOne(user);
             return fuser;
         }
@@ -73,22 +71,6 @@ async function getUserFromToken(token) {
     }
 }
 
-function generateToken(user, expiresIn) {
-    let payload = generatePayload(user, new Date())
-    let token = jwt.sign(payload, secrets.jwt, { expiresIn: expiresIn || _expiresIn });
-
-    return token;
-}
-
-function generatePayload(user, createdAt) {
-    return {
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        createdAt: createdAt || user.createdAt
-    }
-}
-
 function refreshToken(token) {
     try {
         let decoded = jwt.decode(token);
@@ -101,5 +83,3 @@ function refreshToken(token) {
         return "Invalid token";
     }
 }
-
-
